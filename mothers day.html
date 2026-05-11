@@ -2869,6 +2869,19 @@ body:has(.sidebar.open) .mobile-toggle {
   .detail.sheet-full { --sheet-y: 0%; }
   .detail.sheet-dragging { transition: none !important; }
 
+  /* Belt-and-suspenders: when the sheet is closed, force every descendant
+     to ignore pointer events too. iOS Safari has a long-standing quirk
+     where children of a `pointer-events: none` parent that's been
+     translated off-screen are still hit-tested at their *layout* rect —
+     which for this sheet is the full viewport. That's the lock-up:
+     after a close, taps and pans hit the invisible sheet children
+     (header, close button, body) instead of the map underneath. */
+  .detail:not(.open),
+  .detail:not(.open) * {
+    pointer-events: none !important;
+    touch-action: auto !important;
+  }
+
   /* Drag handle at the top of the sheet — wider hit area so the gesture
      is forgiving. The whole top region (handle + header) gets
      touch-action: none so iOS Safari doesn't intercept the drag as a
