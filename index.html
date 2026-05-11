@@ -3355,24 +3355,28 @@ body:has(.sidebar.open) .mobile-toggle {
   .detail-drag-handle {
     display: flex !important;
     justify-content: center;
-    align-items: center;
-    padding: 14px 0 8px;
+    align-items: flex-start;
+    padding: 14px 0 14px;
     cursor: grab;
     touch-action: none;
     flex-shrink: 0;
     padding-top: max(14px, env(safe-area-inset-top));
-    /* Bigger invisible hit area below the visible bar */
-    min-height: 44px;
+    /* Bigger hit area — the touch listener for the drag gesture is bound
+       to this element ONLY (not the whole #detail), so we need a generous
+       grab target. ~60px gives ample room above the title text. */
+    min-height: 60px;
   }
   .detail-drag-handle:active { cursor: grabbing; }
   .detail-drag-bar {
-    width: 44px;
-    height: 5px;
+    width: 56px;
+    height: 6px;
     border-radius: 999px;
-    background: rgba(13, 21, 48, 0.22);
+    background: rgba(13, 21, 48, 0.32);
   }
-  /* Header is also drag-able (gives the user a generous grab area) */
-  .detail-head { touch-action: none; }
+  /* Header text area: normal browser touch behaviour now that we no longer
+     listen for drag here. Buttons inside .detail-head (the X close button)
+     fire taps via normal browser synthesis. */
+  .detail-head { touch-action: pan-y; }
   /* Keep the close X visible on mobile too as a fallback dismiss. The
      drag-down gesture is the primary, but tappable X is always there. */
   .detail-close {
@@ -9115,13 +9119,22 @@ async function init() {
       else snapFull();
     }
 
-    // Touch (primary on iOS / Android)
-    detailEl.addEventListener('touchstart', onStart, { passive: true });
-    detailEl.addEventListener('touchmove', onMove, { passive: false });
-    detailEl.addEventListener('touchend', onEnd);
-    detailEl.addEventListener('touchcancel', onEnd);
-    // Pointer for desktop
-    detailEl.addEventListener('pointerdown', e => { if (e.pointerType !== 'touch') onStart(e); });
+    // Bind touch listeners ONLY to the drag handle, not the whole #detail.
+    // Why: when bound to #detail, iOS Safari treated every touch inside the
+    // sheet (including taps on the X button, edit/delete buttons, and even
+    // touches on the body content) as part of the sheet's gesture sequence —
+    // synthesized click events were swallowed and the panel got stuck. With
+    // listeners scoped to .detail-drag-handle, taps elsewhere route through
+    // the browser normally and the close X / Edit / Delete buttons fire as
+    // expected. The body can still be scrolled by the browser (it has
+    // touch-action: pan-y); to dismiss the sheet the user grabs the handle.
+    const dragTarget = detailEl.querySelector('.detail-drag-handle') || detailEl;
+    dragTarget.addEventListener('touchstart', onStart, { passive: true });
+    dragTarget.addEventListener('touchmove', onMove, { passive: false });
+    dragTarget.addEventListener('touchend', onEnd);
+    dragTarget.addEventListener('touchcancel', onEnd);
+    // Pointer for desktop — also scoped to the drag handle for consistency.
+    dragTarget.addEventListener('pointerdown', e => { if (e.pointerType !== 'touch') onStart(e); });
     document.addEventListener('pointermove', e => { if (e.pointerType !== 'touch' && phase !== 'idle') onMove(e); });
     document.addEventListener('pointerup', e => { if (e.pointerType !== 'touch' && phase !== 'idle') onEnd(); });
 
