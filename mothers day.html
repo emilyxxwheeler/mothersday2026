@@ -6048,33 +6048,36 @@ function selectRestaurant(id, opts = {}) {
 }
 
 function clearSelection() {
+  // DELIBERATELY MINIMAL: every previous variant of this function has
+  // somehow been part of an iOS Safari hang on close. Strip to the bare
+  // bones and schedule everything else (marker icon flip, list entry
+  // de-select) for the next tick so they can't run inside the touch
+  // handler's synchronous frame.
   const oldId = state.selectedId;
   state.selectedId = null;
-  if (oldId != null) {
-    // Update the previously-selected marker icon (un-selected style)
-    const m = state.markers && state.markers.get ? state.markers.get(oldId) : null;
-    const r = state.restaurants && state.restaurants.find
-      ? state.restaurants.find(x => x.id === oldId) : null;
-    if (m && r) {
-      try { m.setIcon(makeIcon(r.status, false)); } catch (_) {}
-    }
-    // Light DOM update — just drop the .selected class on the old entry,
-    // no full list rebuild. Avoids re-rendering 355 nodes on every close
-    // (which is what was making the page lock up).
-    try {
-      const oldEntry = document.querySelector(`#list .entry[data-id="${oldId}"].selected`);
-      if (oldEntry) oldEntry.classList.remove('selected');
-    } catch (_) {}
-  }
-  // Slide the detail panel off-screen — CSS handles the animation via
-  // the transform + visibility transitions on `.detail` (no .open).
   const detail = document.getElementById('detail');
   if (detail) {
     detail.classList.remove('open', 'sheet-full', 'sheet-dragging');
     try { detail.style.removeProperty('--sheet-y'); } catch (_) {}
-    // Also drop any leftover inline display:none from earlier builds so
-    // the next renderDetail() doesn't have to clear it.
     if (detail.style.display === 'none') detail.style.removeProperty('display');
+  }
+  // Defer the cosmetic cleanup to the next event-loop tick. Whatever's
+  // happening synchronously during close on iOS Safari — Leaflet's
+  // setIcon DOM churn, the list-entry classList write, anything that
+  // touches paint — gets pushed off the critical path.
+  if (oldId != null) {
+    setTimeout(() => {
+      try {
+        const m = state.markers && state.markers.get ? state.markers.get(oldId) : null;
+        const r = state.restaurants && state.restaurants.find
+          ? state.restaurants.find(x => x.id === oldId) : null;
+        if (m && r) m.setIcon(makeIcon(r.status, false));
+      } catch (_) {}
+      try {
+        const oldEntry = document.querySelector(`#list .entry[data-id="${oldId}"].selected`);
+        if (oldEntry) oldEntry.classList.remove('selected');
+      } catch (_) {}
+    }, 0);
   }
 }
 
