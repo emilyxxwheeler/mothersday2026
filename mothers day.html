@@ -6107,11 +6107,13 @@ function showDetailPanel() {
 // can always find it, regardless of how far init() has progressed. Guarded
 // against errors and tied directly to clearSelection — the simplest possible
 // close path. Exposed on window for the same reason.
-function closeDetailPanel(e) {
-  if (e) {
-    try { e.stopPropagation(); } catch (_) {}
-    try { e.preventDefault(); } catch (_) {}
-  }
+function closeDetailPanel() {
+  // Intentionally NOT calling preventDefault / stopPropagation on the
+  // incoming event. Preventing the default on a tap event leaves iOS
+  // Safari in a "gesture suppressed" state where the page freezes for
+  // a beat after the close — even though the slide-out animation
+  // plays. The X button is a <button type="button">, so it has no
+  // default action worth suppressing anyway.
   try { clearSelection(); } catch (err) { console.error('[closeDetailPanel] error:', err); }
   return false;
 }
