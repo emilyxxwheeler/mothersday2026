@@ -4696,6 +4696,9 @@ function renderDetail() {
     detail.classList.remove('open');
     return;
   }
+  // Undo any pending or applied `display: none` from a previous close before
+  // we add `.open` and the slide-in transition runs.
+  if (typeof showDetailPanel === 'function') showDetailPanel();
 
   const def = STATUS_BY_ID[r.status] || STATUS_BY_ID['wishlist'];
   document.getElementById('detailNum').textContent = `No. ${String(state.restaurants.findIndex(x => x.id === r.id) + 1).padStart(3, '0')} · ${def.label}`;
@@ -5370,6 +5373,37 @@ function clearSelection() {
     // Belt-and-suspenders for mobile: explicitly push the sheet off-screen
     // in case the inline --sheet-y override from a previous drag is still set.
     try { detail.style.removeProperty('--sheet-y'); } catch (_) {}
+    // After the slide-out transition (320ms) completes, take the sheet
+    // OUT of the layout entirely with `display: none`. Without this, iOS
+    // Safari keeps dispatching touch events to the still-mounted #detail
+    // (which has touchstart/move/end listeners for the swipe-to-dismiss
+    // gesture) — those handlers `preventDefault` and the map underneath
+    // never gets the touch, so the page feels frozen until reload.
+    if (detail._displayNoneTimer) clearTimeout(detail._displayNoneTimer);
+    detail._displayNoneTimer = setTimeout(() => {
+      // Only hide if we're still closed (user may have reopened it in <320ms)
+      if (!detail.classList.contains('open')) {
+        detail.style.display = 'none';
+      }
+      detail._displayNoneTimer = null;
+    }, 340);
+  }
+}
+
+// Undo the `display: none` we set after close so the next open can animate.
+// Called from renderDetail() before the panel becomes visible again.
+function showDetailPanel() {
+  const detail = document.getElementById('detail');
+  if (!detail) return;
+  if (detail._displayNoneTimer) {
+    clearTimeout(detail._displayNoneTimer);
+    detail._displayNoneTimer = null;
+  }
+  if (detail.style.display === 'none') {
+    detail.style.removeProperty('display');
+    // Force a reflow so the browser registers the display change before the
+    // .open class adds the slide-in transform — otherwise the panel snaps in.
+    void detail.offsetWidth;
   }
 }
 
