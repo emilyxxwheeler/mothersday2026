@@ -4063,6 +4063,47 @@ function refreshMarkers() {
   }
 }
 
+// Relax any filter that would currently hide `r`. Used after adding or
+// editing an entry so the user always sees the pin they just acted on.
+// Returns the list of filter labels that were cleared so the caller can
+// surface a one-line "Cleared X filter" toast if they want.
+function clearFiltersHidingRestaurant(r) {
+  if (!r) return [];
+  const f = state.filters;
+  const cleared = [];
+  if (r.status && !f.statuses.has(r.status)) {
+    f.statuses = new Set(STATUS_ORDER);
+    cleared.push('status');
+  }
+  if (f.boroughs.size > 0 && r.borough && !f.boroughs.has(r.borough)) {
+    f.boroughs.clear();
+    cleared.push('borough');
+  }
+  if (f.neighborhoods.size > 0 && r.neighborhood && !f.neighborhoods.has(r.neighborhood)) {
+    f.neighborhoods.clear();
+    cleared.push('neighborhood');
+  }
+  // New entries don't carry a cuisineGroup yet, so the filter check falls
+  // back to raw cuisine — which almost never matches a cuisine GROUP. Just
+  // clear the cuisine filter if the new entry wouldn't match.
+  if (f.cuisines.size > 0 && !f.cuisines.has(r.cuisineGroup || r.cuisine)) {
+    f.cuisines.clear();
+    cleared.push('cuisine');
+  }
+  if (f.michelin && !r.michelin) { f.michelin = false; cleared.push('Michelin'); }
+  if (f.jb && !r.jamesBeard)     { f.jb = false;       cleared.push('James Beard'); }
+  if (f.search && f.search.trim()) {
+    const hay = [r.name, r.cuisine, r.neighborhood, r.borough, r.notes, r.mustOrder, r.address, r.michelin, r.jamesBeard].join(' ').toLowerCase();
+    if (!hay.includes(f.search.trim().toLowerCase())) {
+      f.search = '';
+      const si = document.getElementById('searchInput');
+      if (si) si.value = '';
+      cleared.push('search');
+    }
+  }
+  return cleared;
+}
+
 // ====== Filtering ======
 function getVisibleRestaurants() {
   const f = state.filters;
@@ -5213,7 +5254,18 @@ function flyToRestaurant(r) {
 
   console.log(`[flyTo] "${r.name}" target=(${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}) zoom=${targetZoom}`);
 
-  map.flyTo([r.lat, r.lng], targetZoom, { duration: 0.35 });
+  // Leaflet's flyTo can throw "Invalid LatLng object: (NaN, NaN)" when the
+  // map container has zero dimensions (e.g. a tab that hasn't been painted
+  // yet, an embedded iframe at 0×0). Swallow that — the marker is already
+  // on the map; we just couldn't animate the camera. Falling back to a
+  // setView attempt covers the case where dimensions return shortly.
+  try {
+    map.flyTo([r.lat, r.lng], targetZoom, { duration: 0.35 });
+  } catch (e) {
+    console.warn('[flyTo] animation failed, attempting setView:', e.message);
+    try { map.setView([r.lat, r.lng], targetZoom, { animate: false }); }
+    catch (e2) { console.warn('[flyTo] setView also failed:', e2.message); }
+  }
 }
 
 function selectRestaurant(id, opts = {}) {
@@ -6199,7 +6251,10 @@ function mapBorough(addr) {
 async function enrichRestaurant(name, partial) {
   const result = { ...partial };
 
-  // Fields we'd like enriched if they're blank
+  // Fields we'd like enriched if they're blank. Places autocomplete fills
+  // `websiteUrl` (not `website`) — treat either as satisfying the website
+  // need so we don't trigger a 6-second Nominatim fallback when Places has
+  // already given us everything.
   const needs = {
     coords: !result.lat || !result.lng,
     address: !result.address,
@@ -6207,7 +6262,7 @@ async function enrichRestaurant(name, partial) {
     borough: !result.borough,
     cuisine: !result.cuisine,
     phone: !result.phone,
-    website: !result.website,
+    website: !result.website && !result.websiteUrl,
   };
 
   const anythingNeeded = Object.values(needs).some(Boolean);
@@ -6300,27 +6355,39 @@ async function enrichRestaurant(name, partial) {
     result.lng = lng;
   }
   if (!result.reserveUrl) {
-    // Try to auto-discover a real reservation link (Resy / OpenTable / Tock)
-    // by searching DDG via a CORS proxy. Best-effort, capped at 5s — if it
-    // fails we still hand the user the existing Google-search fallback so
-    // they can find it manually.
-    try {
-      const found = await findReservationLink(name, result.neighborhood, result.borough);
-      if (found) {
-        result.reserveUrl = found;
-        result.reservePlatform = platformFromUrl(found) || 'verified';
-        result._reservationAutoFound = true;
-      }
-    } catch (e) {
-      console.warn('[reservation-search] failed:', e.message);
-    }
-    if (!result.reserveUrl) {
-      result.reserveUrl = smartSearchUrl(name, result.neighborhood, result.borough);
-      result.reservePlatform = 'search';
-    }
+    // Use the Google-search fallback immediately so save is instant. The
+    // real Resy / OpenTable / Tock URL is discovered in the background
+    // after save (see backfillReservationLink) — the CORS-proxy search
+    // can take 3–5 seconds and shouldn't block the user.
+    result.reserveUrl = smartSearchUrl(name, result.neighborhood, result.borough);
+    result.reservePlatform = 'search';
+    result._needsReservationBackfill = true;
   }
 
   return result;
+}
+
+// Background reservation-link discovery. Kicked off after a new restaurant
+// is saved (or an edit that didn't supply a manual URL). When a real
+// platform URL is found, applyMod updates the entry in place so the
+// detail panel re-renders with the upgraded link.
+async function backfillReservationLink(id, name, neighborhood, borough) {
+  try {
+    const found = await findReservationLink(name, neighborhood, borough);
+    if (!found) return;
+    const r = state.restaurants.find(x => x.id === id);
+    // Don't overwrite if the user has since typed their own URL
+    if (!r || (r.reservePlatform && r.reservePlatform !== 'search')) return;
+    applyMod(id, {
+      reserveUrl: found,
+      reservationLink: found,
+      reservePlatform: platformFromUrl(found) || 'verified',
+    });
+    saveOverrides();
+    renderDetail();
+  } catch (e) {
+    console.warn('[reservation-backfill] failed:', e.message);
+  }
 }
 
 async function saveModal() {
@@ -6459,18 +6526,28 @@ async function saveModal() {
       if (data._enriched && (data.address || data.neighborhood)) {
         enrichedBits.push(data.address || data.neighborhood);
       }
-      if (data._reservationAutoFound && data.reservePlatform) {
-        const platformLabel = { resy: 'Resy', opentable: 'OpenTable', tock: 'Tock' }[data.reservePlatform] || 'reservations';
-        enrichedBits.push(`${platformLabel} link`);
-      }
       toast(enrichedBits.length
         ? `Added ${name} — found ${enrichedBits.join(' + ')}.`
         : `Added ${name}.`);
       focusId = newId;
+      // Kick off the real reservation-link search in the background. The
+      // save itself is no longer blocked by it; the detail panel re-renders
+      // with the upgraded URL once a confident match comes back.
+      if (data._needsReservationBackfill) {
+        backfillReservationLink(newId, name, data.neighborhood, data.borough);
+      }
     }
 
     saveOverrides();
     composeRestaurants();
+    // If active filters would hide the just-added/edited entry, relax them
+    // so the user always sees their new pin. Without this, a user filtered
+    // to e.g. "Italian — Manhattan" who adds a Brooklyn Mexican spot would
+    // see the map fly to nowhere with no pin appearing.
+    if (focusId != null) {
+      const focused = state.restaurants.find(r => r.id === focusId);
+      if (focused) clearFiltersHidingRestaurant(focused);
+    }
     closeModal();
     // Render first so the new entry's marker is actually created on the map
     // (selectRestaurant only updates icons for markers that already exist).
