@@ -4506,12 +4506,17 @@ function renderList() {
     `;
   }).join('');
 
-  el.querySelectorAll('.entry').forEach(e => {
-    e.addEventListener('click', () => {
-      const id = parseInt(e.dataset.id, 10);
-      selectRestaurant(id, { panMap: true });
+  // Single delegated listener for all entries (vs. one per row × 355 rows).
+  // Wire it up once; subsequent renderList() calls just swap innerHTML.
+  if (!el._delegatedClick) {
+    el.addEventListener('click', (e) => {
+      const entry = e.target.closest('.entry');
+      if (!entry || !el.contains(entry)) return;
+      const id = parseInt(entry.dataset.id, 10);
+      if (Number.isFinite(id)) selectRestaurant(id, { panMap: true });
     });
-  });
+    el._delegatedClick = true;
+  }
 }
 
 function starsCount(michelin) {
@@ -5204,44 +5209,61 @@ function flyToRestaurant(r) {
 
   console.log(`[flyTo] "${r.name}" target=(${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}) zoom=${targetZoom}`);
 
-  map.flyTo([r.lat, r.lng], targetZoom, { duration: 0.6 });
+  map.flyTo([r.lat, r.lng], targetZoom, { duration: 0.35 });
 }
 
 function selectRestaurant(id, opts = {}) {
-  // Surgical marker update: only the OLD selected and the NEW selected
-  // markers actually change appearance — re-rendering all 355 SVG icons
-  // on every click was the biggest source of click-around lag.
+  // Hot path — fires on every pin/list click. Keep it snappy by:
+  //   1. Flipping `.selected` on just the two affected list entries
+  //      (rebuilding all ~355 list items was the main click-lag culprit).
+  //   2. Calling setIcon on the old + new marker only
+  //      (icons are cached in _iconCache so this is effectively free).
+  //   3. Bailing on a no-op re-click of the currently selected pin.
   const prevId = state.selectedId;
+  if (prevId === id) return;
   state.selectedId = id;
-  renderList();
-  renderDetail();
+  const prevR = prevId != null ? state.restaurants.find(x => x.id === prevId) : null;
+  const newR = id != null ? state.restaurants.find(x => x.id === id) : null;
+
+  // Surgical sidebar list update
+  const listEl = document.getElementById('list');
+  if (listEl) {
+    if (prevId != null) {
+      const oldEntry = listEl.querySelector(`.entry[data-id="${prevId}"].selected`);
+      if (oldEntry) oldEntry.classList.remove('selected');
+    }
+    if (id != null) {
+      const newEntry = listEl.querySelector(`.entry[data-id="${id}"]`);
+      if (newEntry) {
+        newEntry.classList.add('selected');
+        newEntry.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+  }
+
+  // Surgical marker update
   if (prevId != null && prevId !== id) {
     const prevMarker = state.markers.get(prevId);
-    const prevR = state.restaurants.find(x => x.id === prevId);
     if (prevMarker && prevR) prevMarker.setIcon(makeIcon(prevR.status, false));
   }
   if (id != null) {
     const newMarker = state.markers.get(id);
-    const newR = state.restaurants.find(x => x.id === id);
     if (newMarker && newR) newMarker.setIcon(makeIcon(newR.status, true));
   }
-  // Always focus the map on the selected restaurant (whether they clicked
-  // the list entry or the map marker — consistent behavior in both cases)
+
+  renderDetail();
+
   if (opts.panMap !== false) {
-    const r = state.restaurants.find(x => x.id === id);
-    if (!r) {
+    if (!newR) {
       console.warn(`[select] no restaurant found for id=${id}`);
     } else {
-      flyToRestaurant(r);
-      // Lazy coord backfill: the seed data uses neighborhood-centroid
-      // coords. Geocode the actual address, update the marker + re-fly
-      // when the precise location comes back.
-      if (!r.coordsAccurate && r.address) {
-        backfillCoordsForRestaurant(r);
+      flyToRestaurant(newR);
+      if (!newR.coordsAccurate && newR.address) {
+        backfillCoordsForRestaurant(newR);
       }
     }
   }
-  // On mobile, close sidebar so user can see map+detail
+
   if (window.innerWidth <= 900) {
     document.getElementById('sidebar').classList.remove('open');
   }
@@ -6940,6 +6962,14 @@ function finishComparisons() {
   renderDetail();
 }
 
+// Fields whose change requires a full re-render (filter counts, list order,
+// marker color, etc). Everything else is "detail-only" and we can skip the
+// expensive chip / list / marker rebuild.
+const FULL_RENDER_FIELDS = new Set([
+  'status', 'name', 'cuisine', 'cuisineGroup', 'neighborhood', 'borough',
+  'price', 'michelin', 'jamesBeard', 'lat', 'lng', 'format', 'listCategory',
+]);
+
 function applyMod(id, mod) {
   const addedIdx = state.overrides.added.findIndex(x => x.id === id);
   if (addedIdx >= 0) {
@@ -6949,9 +6979,17 @@ function applyMod(id, mod) {
   }
   saveOverrides();
   composeRestaurants();
-  // Michelin / JB lookup builds from current state — invalidate when data changes
   invalidateAccoladesLookup();
-  render();
+
+  // Detail-only edits (notes / rating / visitedWith / mustOrder / hours / …)
+  // don't affect filters, list order, or marker color — skip the heavy
+  // ~11ms render() and just refresh the open detail panel.
+  const needsFullRender = Object.keys(mod).some(k => FULL_RENDER_FIELDS.has(k));
+  if (needsFullRender) {
+    render();
+  } else if (id === state.selectedId) {
+    renderDetail();
+  }
 }
 
 function deleteSelected() {
@@ -7132,19 +7170,23 @@ async function init() {
   };
   console.log('[debug] window.testGeocoder() — verify the geocoders are reachable from your browser');
 
-  // Search
+  // Search — debounced so a fast typer doesn't trigger a 5ms render+marker
+  // refresh on every keystroke. 80ms feels instant and coalesces bursts.
   const searchInput = document.getElementById('searchInput');
   const searchClear = document.getElementById('searchClear');
+  let searchTimer = null;
+  const flushSearch = () => { searchTimer = null; renderList(); refreshMarkers(); };
   searchInput.addEventListener('input', e => {
     state.filters.search = e.target.value;
     searchClear.classList.toggle('visible', !!e.target.value);
-    renderList();
-    refreshMarkers();
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(flushSearch, 80);
   });
   searchClear.addEventListener('click', () => {
     searchInput.value = '';
     state.filters.search = '';
     searchClear.classList.remove('visible');
+    if (searchTimer) { clearTimeout(searchTimer); searchTimer = null; }
     renderList();
     refreshMarkers();
   });
