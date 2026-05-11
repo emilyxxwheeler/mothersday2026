@@ -3760,11 +3760,7 @@ body:has(.sidebar.open) .mobile-toggle {
       </div>
       <div class="field">
         <label class="field-label">Notes <span class="optional-tag">optional, you can add more anytime</span></label>
-        <textarea class="textarea" id="fNotes" placeholder="Anything to remember… or just leave blank"></textarea>
-      </div>
-      <div class="field">
-        <label class="field-label">Must Order / Highlights <span class="optional-tag">optional</span></label>
-        <textarea class="textarea" id="fMustOrder" placeholder="What you have to order…"></textarea>
+        <textarea class="textarea" id="fNotes" placeholder="What to remember — favorite dishes, who you went with, rating, anything…"></textarea>
       </div>
 
       <button class="optional-toggle" id="optionalToggle" type="button">
@@ -4290,16 +4286,39 @@ function composeRestaurants() {
   for (const r of state.base) {
     if (deletedSet.has(r.id)) continue;
     const mod = state.overrides.modifications[r.id];
-    const merged = mod ? { ...r, ...mod } : r;
+    const merged = mod ? { ...r, ...mod } : { ...r };
     if (merged.status) merged.status = normalizeStatus(merged.status);
+    foldLegacyNotesFields(merged);
     result.push(merged);
   }
   for (const r of state.overrides.added) {
     const copy = { ...r };
     if (copy.status) copy.status = normalizeStatus(copy.status);
+    foldLegacyNotesFields(copy);
     result.push(copy);
   }
   state.restaurants = result;
+}
+
+// The Notes section in the detail panel used to be split into four fields
+// (Rating / With / Must Order / Notes) and the seed data still carries those
+// as separate columns. The UI is now a single notes textarea, so we fold any
+// non-empty legacy values into `notes` at compose time. The originals stay in
+// `state.base` (the raw seed) and `state.overrides` (raw modifications) until
+// the user edits notes — at which point applyMod clears them explicitly so
+// the fold is a one-time effect, not a recurring duplication.
+function foldLegacyNotesFields(r) {
+  const parts = [];
+  if (r.rating && r.rating !== 'Not Visited') parts.push(`Rating: ${r.rating}`);
+  if (r.visitedWith) parts.push(`With: ${r.visitedWith}`);
+  if (r.mustOrder) parts.push(`Must order: ${r.mustOrder}`);
+  if (parts.length === 0) return;
+  const legacyText = parts.join('\n');
+  const existing = (r.notes || '').trim();
+  r.notes = existing ? `${existing}\n\n${legacyText}` : legacyText;
+  r.rating = '';
+  r.visitedWith = '';
+  r.mustOrder = '';
 }
 
 // ====== Pin SVG ======
@@ -4713,7 +4732,7 @@ function clearFiltersHidingRestaurant(r) {
   if (f.michelin && !r.michelin) { f.michelin = false; cleared.push('Michelin'); }
   if (f.jb && !r.jamesBeard)     { f.jb = false;       cleared.push('James Beard'); }
   if (f.search && f.search.trim()) {
-    const hay = [r.name, r.cuisine, r.neighborhood, r.borough, r.notes, r.mustOrder, r.address, r.michelin, r.jamesBeard].join(' ').toLowerCase();
+    const hay = [r.name, r.cuisine, r.neighborhood, r.borough, r.notes, r.address, r.michelin, r.jamesBeard].join(' ').toLowerCase();
     if (!hay.includes(f.search.trim().toLowerCase())) {
       f.search = '';
       const si = document.getElementById('searchInput');
@@ -4739,7 +4758,7 @@ function getVisibleRestaurants() {
     if (search) {
       const hay = [
         r.name, r.cuisine, r.neighborhood, r.borough,
-        r.notes, r.mustOrder, r.address, r.michelin, r.jamesBeard
+        r.notes, r.address, r.michelin, r.jamesBeard
       ].join(' ').toLowerCase();
       if (!hay.includes(search)) return false;
     }
@@ -6500,7 +6519,6 @@ function switchAddToEdit(matchId) {
   document.getElementById('fCuisine').value = r.cuisine || '';
   document.getElementById('fAddress').value = r.address || '';
   document.getElementById('fNeighborhood').value = r.neighborhood || '';
-  document.getElementById('fMustOrder').value = r.mustOrder || '';
   document.getElementById('fNotes').value = r.notes || '';
   document.getElementById('fPrice').value = r.price || '';
   document.getElementById('fMichelin').value = r.michelin || '';
@@ -6574,7 +6592,7 @@ function closeSpellModal() {
 function openAddModal(prefillName) {
   editingId = null;
   document.getElementById('modalTitle').innerHTML = '<span class="modal-title-blue">New</span> <em>Entry</em>';
-  ['fName', 'fCuisine', 'fAddress', 'fNeighborhood', 'fMustOrder', 'fNotes', 'fResy'].forEach(id => {
+  ['fName', 'fCuisine', 'fAddress', 'fNeighborhood', 'fNotes', 'fResy'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('fPrice').value = '';
@@ -6628,7 +6646,6 @@ function openEditModal(id) {
   document.getElementById('fCuisine').value = r.cuisine || '';
   document.getElementById('fAddress').value = r.address || '';
   document.getElementById('fNeighborhood').value = r.neighborhood || '';
-  document.getElementById('fMustOrder').value = r.mustOrder || '';
   document.getElementById('fNotes').value = r.notes || '';
   document.getElementById('fPrice').value = r.price || '';
   document.getElementById('fMichelin').value = r.michelin || '';
@@ -7073,9 +7090,14 @@ async function saveModal() {
     borough: document.getElementById('fBorough').value.trim(),
     price: document.getElementById('fPrice').value.trim(),
     michelin: document.getElementById('fMichelin').value.trim(),
-    mustOrder: document.getElementById('fMustOrder').value.trim(),
     notes: document.getElementById('fNotes').value.trim(),
     status: getPickedStatus(),
+    // fNotes is preloaded with the folded notes (Rating/With/Must order
+    // already merged in). Clear the legacy fields so foldLegacyNotesFields
+    // doesn't re-append them on the next compose.
+    rating: '',
+    visitedWith: '',
+    mustOrder: '',
   };
 
   // For edits, preserve existing coords unless neighborhood/address changed
@@ -8489,6 +8511,13 @@ const FULL_RENDER_FIELDS = new Set([
 ]);
 
 function applyMod(id, mod) {
+  // When the user edits notes, also blank out the legacy rating/visitedWith/
+  // mustOrder fields. composeRestaurants() folds those into the displayed
+  // notes textarea, so the next compose would otherwise re-append them on
+  // top of the user's freshly-saved text.
+  if ('notes' in mod && !('rating' in mod) && !('visitedWith' in mod) && !('mustOrder' in mod)) {
+    mod = { ...mod, rating: '', visitedWith: '', mustOrder: '' };
+  }
   const addedIdx = state.overrides.added.findIndex(x => x.id === id);
   if (addedIdx >= 0) {
     state.overrides.added[addedIdx] = { ...state.overrides.added[addedIdx], ...mod };
