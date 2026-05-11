@@ -8952,34 +8952,12 @@ async function init() {
   document.getElementById('compareSkipBtn').addEventListener('click', skipCompareRound);
   document.getElementById('compareFinishBtn').addEventListener('click', finishComparisons);
 
-  // Detail panel close — primary path is the inline `onclick` on the X
-  // button. Belt-and-suspenders: also wire a direct touchend on the X so
-  // iOS Safari doesn't have to synthesise a click. Some Safari versions
-  // suppress the synthesised click when a non-passive touchmove listener
-  // on an ancestor has called preventDefault recently — this guarantees
-  // the close still works in those edge cases.
-  (function wireDetailClose() {
-    const btn = document.getElementById('detailClose');
-    if (!btn) return;
-    let lastFire = 0;
-    const fire = (e) => {
-      const now = Date.now();
-      if (now - lastFire < 350) return;          // dedupe touch + click
-      lastFire = now;
-      try { closeDetailPanel(e); } catch (err) { console.error('[close] error', err); }
-    };
-    btn.addEventListener('touchend', (e) => {
-      // preventDefault on touchend cancels the synthesised click event so
-      // we don't double-fire — the dedupe above is a safety net anyway.
-      if (e.cancelable) e.preventDefault();
-      fire(e);
-    }, { passive: false });
-    btn.addEventListener('click', fire);
-  })();
-
-  // Belt-and-suspenders touch+click binding for the action buttons. Same
-  // iOS Safari click-synthesis issue as the X close button — bind both
-  // touchend (with dedupe) and click so the action always fires.
+  // Detail-panel action buttons: bind both touchend AND click so iOS
+  // Safari has two independent paths to fire the action. Keep both
+  // handlers PASSIVE (no preventDefault) — calling preventDefault on a
+  // tap on iOS can leave the browser in a "gesture suppressed" state
+  // where subsequent map taps and pans are eaten. The dedupe (350 ms)
+  // prevents double-fire if both events arrive.
   function bindTapAction(id, fn) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -8990,12 +8968,12 @@ async function init() {
       lastFire = now;
       try { fn(e); } catch (err) { console.error('[' + id + '] error', err); }
     };
-    el.addEventListener('touchend', (e) => {
-      if (e.cancelable) e.preventDefault();
-      fire(e);
-    }, { passive: false });
+    // passive: true everywhere — never tell iOS to suppress its defaults
+    // on a tap. The dedupe handles the touch→click double-fire safely.
+    el.addEventListener('touchend', fire, { passive: true });
     el.addEventListener('click', fire);
   }
+  bindTapAction('detailClose', (e) => closeDetailPanel(e));
   bindTapAction('editBtn', () => { if (state.selectedId != null) openEditModal(state.selectedId); });
   bindTapAction('quickToggle', quickToggle);
   bindTapAction('deleteBtn', deleteSelected);
@@ -9131,7 +9109,13 @@ async function init() {
         applyPct(next);
         lastMoveTime = performance.now();
         lastMoveY = y;
-        if (e.cancelable) e.preventDefault();
+        // Intentionally NOT calling preventDefault here even when we could.
+        // The drag handle has `touch-action: none` in CSS, so the browser
+        // already won't try to scroll/zoom on touches that started there —
+        // and calling preventDefault on iOS Safari can leave the page in
+        // a "gesture suppressed" state where the map below feels frozen
+        // for a beat after the close. Letting the event remain passive
+        // is enough.
       }
     }
 
@@ -9165,10 +9149,14 @@ async function init() {
     // expected. The body can still be scrolled by the browser (it has
     // touch-action: pan-y); to dismiss the sheet the user grabs the handle.
     const dragTarget = detailEl.querySelector('.detail-drag-handle') || detailEl;
+    // Passive everywhere — we never need preventDefault because the CSS
+    // `touch-action: none` on the drag handle already disables browser
+    // gestures in that region. Passive listeners don't leave iOS in any
+    // suppressed state once the touch sequence ends.
     dragTarget.addEventListener('touchstart', onStart, { passive: true });
-    dragTarget.addEventListener('touchmove', onMove, { passive: false });
-    dragTarget.addEventListener('touchend', onEnd);
-    dragTarget.addEventListener('touchcancel', onEnd);
+    dragTarget.addEventListener('touchmove', onMove, { passive: true });
+    dragTarget.addEventListener('touchend', onEnd, { passive: true });
+    dragTarget.addEventListener('touchcancel', onEnd, { passive: true });
     // Pointer for desktop — also scoped to the drag handle for consistency.
     dragTarget.addEventListener('pointerdown', e => { if (e.pointerType !== 'touch') onStart(e); });
     document.addEventListener('pointermove', e => { if (e.pointerType !== 'touch' && phase !== 'idle') onMove(e); });
