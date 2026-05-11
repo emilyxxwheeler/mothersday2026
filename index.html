@@ -5292,7 +5292,13 @@ function selectRestaurant(id, opts = {}) {
       const newEntry = listEl.querySelector(`.entry[data-id="${id}"]`);
       if (newEntry) {
         newEntry.classList.add('selected');
-        newEntry.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        // Only scroll the sidebar entry into view on desktop. On mobile
+        // the sidebar slides off-screen, so scrollIntoView there can yank
+        // the document root in iOS Safari and leave the page in a stuck
+        // scroll state once the detail closes.
+        if (window.innerWidth > 900) {
+          newEntry.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
       }
     }
   }
@@ -7593,11 +7599,21 @@ async function init() {
     document.addEventListener('pointermove', e => { if (e.pointerType !== 'touch' && phase !== 'idle') onMove(e); });
     document.addEventListener('pointerup', e => { if (e.pointerType !== 'touch' && phase !== 'idle') onEnd(); });
 
-    // When the detail closes (selectedId set to null), drop any drag state
+    // When the detail closes (selectedId set to null), drop ALL drag state.
+    // Resetting `phase` here matters: if a touchcancel was missed mid-drag
+    // (the OS swallowed it because the user multi-touched, scrolled the URL
+    // bar, or backgrounded the tab), phase could otherwise stay 'dragging'
+    // and the next touchmove on the sheet would call preventDefault and
+    // appear to lock the page.
     const obs = new MutationObserver(() => {
       if (!detailEl.classList.contains('open')) {
-        detailEl.classList.remove('sheet-dragging');
+        phase = 'idle';
+        startY = currentY = lastMoveY = 0;
+        pct = 100;
+        startPct = 50;
+        detailEl.classList.remove('sheet-dragging', 'sheet-full');
         detailEl.style.removeProperty('--sheet-y');
+        detailEl.style.removeProperty('transform');
       }
     });
     obs.observe(detailEl, { attributes: true, attributeFilter: ['class'] });

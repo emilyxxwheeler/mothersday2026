@@ -1759,6 +1759,10 @@ a { color: inherit; text-decoration: none; }
   color: var(--vermillion);
   background: var(--glass-bg-strong);
 }
+.hours-refresh-btn--stacked {
+  align-self: flex-start;
+  margin-bottom: 8px;
+}
 .hours-refresh-btn[disabled] {
   opacity: 0.55;
   cursor: progress;
@@ -4059,6 +4063,47 @@ function refreshMarkers() {
   }
 }
 
+// Relax any filter that would currently hide `r`. Used after adding or
+// editing an entry so the user always sees the pin they just acted on.
+// Returns the list of filter labels that were cleared so the caller can
+// surface a one-line "Cleared X filter" toast if they want.
+function clearFiltersHidingRestaurant(r) {
+  if (!r) return [];
+  const f = state.filters;
+  const cleared = [];
+  if (r.status && !f.statuses.has(r.status)) {
+    f.statuses = new Set(STATUS_ORDER);
+    cleared.push('status');
+  }
+  if (f.boroughs.size > 0 && r.borough && !f.boroughs.has(r.borough)) {
+    f.boroughs.clear();
+    cleared.push('borough');
+  }
+  if (f.neighborhoods.size > 0 && r.neighborhood && !f.neighborhoods.has(r.neighborhood)) {
+    f.neighborhoods.clear();
+    cleared.push('neighborhood');
+  }
+  // New entries don't carry a cuisineGroup yet, so the filter check falls
+  // back to raw cuisine — which almost never matches a cuisine GROUP. Just
+  // clear the cuisine filter if the new entry wouldn't match.
+  if (f.cuisines.size > 0 && !f.cuisines.has(r.cuisineGroup || r.cuisine)) {
+    f.cuisines.clear();
+    cleared.push('cuisine');
+  }
+  if (f.michelin && !r.michelin) { f.michelin = false; cleared.push('Michelin'); }
+  if (f.jb && !r.jamesBeard)     { f.jb = false;       cleared.push('James Beard'); }
+  if (f.search && f.search.trim()) {
+    const hay = [r.name, r.cuisine, r.neighborhood, r.borough, r.notes, r.mustOrder, r.address, r.michelin, r.jamesBeard].join(' ').toLowerCase();
+    if (!hay.includes(f.search.trim().toLowerCase())) {
+      f.search = '';
+      const si = document.getElementById('searchInput');
+      if (si) si.value = '';
+      cleared.push('search');
+    }
+  }
+  return cleared;
+}
+
 // ====== Filtering ======
 function getVisibleRestaurants() {
   const f = state.filters;
@@ -4564,13 +4609,13 @@ function renderHoursSection(r) {
     return `<div class="detail-section detail-hours">
       <div class="detail-hours-head">
         <h4>Hours</h4>
-        <button class="hours-refresh-btn" data-restaurant-id="${r.id}" type="button">
-          <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M14 8a6 6 0 1 1-1.76-4.24"/><path d="M14 2v4h-4"/>
-          </svg>
-          Find hours
-        </button>
       </div>
+      <button class="hours-refresh-btn hours-refresh-btn--stacked" data-restaurant-id="${r.id}" type="button">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 8a6 6 0 1 1-1.76-4.24"/><path d="M14 2v4h-4"/>
+        </svg>
+        Find hours
+      </button>
       <div class="detail-hours-empty">No hours saved yet — fetch from Google.</div>
     </div>`;
   }
@@ -5209,7 +5254,18 @@ function flyToRestaurant(r) {
 
   console.log(`[flyTo] "${r.name}" target=(${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}) zoom=${targetZoom}`);
 
-  map.flyTo([r.lat, r.lng], targetZoom, { duration: 0.35 });
+  // Leaflet's flyTo can throw "Invalid LatLng object: (NaN, NaN)" when the
+  // map container has zero dimensions (e.g. a tab that hasn't been painted
+  // yet, an embedded iframe at 0×0). Swallow that — the marker is already
+  // on the map; we just couldn't animate the camera. Falling back to a
+  // setView attempt covers the case where dimensions return shortly.
+  try {
+    map.flyTo([r.lat, r.lng], targetZoom, { duration: 0.35 });
+  } catch (e) {
+    console.warn('[flyTo] animation failed, attempting setView:', e.message);
+    try { map.setView([r.lat, r.lng], targetZoom, { animate: false }); }
+    catch (e2) { console.warn('[flyTo] setView also failed:', e2.message); }
+  }
 }
 
 function selectRestaurant(id, opts = {}) {
@@ -5236,7 +5292,13 @@ function selectRestaurant(id, opts = {}) {
       const newEntry = listEl.querySelector(`.entry[data-id="${id}"]`);
       if (newEntry) {
         newEntry.classList.add('selected');
-        newEntry.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        // Only scroll the sidebar entry into view on desktop. On mobile
+        // the sidebar slides off-screen, so scrollIntoView there can yank
+        // the document root in iOS Safari and leave the page in a stuck
+        // scroll state once the detail closes.
+        if (window.innerWidth > 900) {
+          newEntry.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
       }
     }
   }
@@ -6195,7 +6257,10 @@ function mapBorough(addr) {
 async function enrichRestaurant(name, partial) {
   const result = { ...partial };
 
-  // Fields we'd like enriched if they're blank
+  // Fields we'd like enriched if they're blank. Places autocomplete fills
+  // `websiteUrl` (not `website`) — treat either as satisfying the website
+  // need so we don't trigger a 6-second Nominatim fallback when Places has
+  // already given us everything.
   const needs = {
     coords: !result.lat || !result.lng,
     address: !result.address,
@@ -6203,7 +6268,7 @@ async function enrichRestaurant(name, partial) {
     borough: !result.borough,
     cuisine: !result.cuisine,
     phone: !result.phone,
-    website: !result.website,
+    website: !result.website && !result.websiteUrl,
   };
 
   const anythingNeeded = Object.values(needs).some(Boolean);
@@ -6296,27 +6361,39 @@ async function enrichRestaurant(name, partial) {
     result.lng = lng;
   }
   if (!result.reserveUrl) {
-    // Try to auto-discover a real reservation link (Resy / OpenTable / Tock)
-    // by searching DDG via a CORS proxy. Best-effort, capped at 5s — if it
-    // fails we still hand the user the existing Google-search fallback so
-    // they can find it manually.
-    try {
-      const found = await findReservationLink(name, result.neighborhood, result.borough);
-      if (found) {
-        result.reserveUrl = found;
-        result.reservePlatform = platformFromUrl(found) || 'verified';
-        result._reservationAutoFound = true;
-      }
-    } catch (e) {
-      console.warn('[reservation-search] failed:', e.message);
-    }
-    if (!result.reserveUrl) {
-      result.reserveUrl = smartSearchUrl(name, result.neighborhood, result.borough);
-      result.reservePlatform = 'search';
-    }
+    // Use the Google-search fallback immediately so save is instant. The
+    // real Resy / OpenTable / Tock URL is discovered in the background
+    // after save (see backfillReservationLink) — the CORS-proxy search
+    // can take 3–5 seconds and shouldn't block the user.
+    result.reserveUrl = smartSearchUrl(name, result.neighborhood, result.borough);
+    result.reservePlatform = 'search';
+    result._needsReservationBackfill = true;
   }
 
   return result;
+}
+
+// Background reservation-link discovery. Kicked off after a new restaurant
+// is saved (or an edit that didn't supply a manual URL). When a real
+// platform URL is found, applyMod updates the entry in place so the
+// detail panel re-renders with the upgraded link.
+async function backfillReservationLink(id, name, neighborhood, borough) {
+  try {
+    const found = await findReservationLink(name, neighborhood, borough);
+    if (!found) return;
+    const r = state.restaurants.find(x => x.id === id);
+    // Don't overwrite if the user has since typed their own URL
+    if (!r || (r.reservePlatform && r.reservePlatform !== 'search')) return;
+    applyMod(id, {
+      reserveUrl: found,
+      reservationLink: found,
+      reservePlatform: platformFromUrl(found) || 'verified',
+    });
+    saveOverrides();
+    renderDetail();
+  } catch (e) {
+    console.warn('[reservation-backfill] failed:', e.message);
+  }
 }
 
 async function saveModal() {
@@ -6455,18 +6532,28 @@ async function saveModal() {
       if (data._enriched && (data.address || data.neighborhood)) {
         enrichedBits.push(data.address || data.neighborhood);
       }
-      if (data._reservationAutoFound && data.reservePlatform) {
-        const platformLabel = { resy: 'Resy', opentable: 'OpenTable', tock: 'Tock' }[data.reservePlatform] || 'reservations';
-        enrichedBits.push(`${platformLabel} link`);
-      }
       toast(enrichedBits.length
         ? `Added ${name} — found ${enrichedBits.join(' + ')}.`
         : `Added ${name}.`);
       focusId = newId;
+      // Kick off the real reservation-link search in the background. The
+      // save itself is no longer blocked by it; the detail panel re-renders
+      // with the upgraded URL once a confident match comes back.
+      if (data._needsReservationBackfill) {
+        backfillReservationLink(newId, name, data.neighborhood, data.borough);
+      }
     }
 
     saveOverrides();
     composeRestaurants();
+    // If active filters would hide the just-added/edited entry, relax them
+    // so the user always sees their new pin. Without this, a user filtered
+    // to e.g. "Italian — Manhattan" who adds a Brooklyn Mexican spot would
+    // see the map fly to nowhere with no pin appearing.
+    if (focusId != null) {
+      const focused = state.restaurants.find(r => r.id === focusId);
+      if (focused) clearFiltersHidingRestaurant(focused);
+    }
     closeModal();
     // Render first so the new entry's marker is actually created on the map
     // (selectRestaurant only updates icons for markers that already exist).
@@ -7512,11 +7599,21 @@ async function init() {
     document.addEventListener('pointermove', e => { if (e.pointerType !== 'touch' && phase !== 'idle') onMove(e); });
     document.addEventListener('pointerup', e => { if (e.pointerType !== 'touch' && phase !== 'idle') onEnd(); });
 
-    // When the detail closes (selectedId set to null), drop any drag state
+    // When the detail closes (selectedId set to null), drop ALL drag state.
+    // Resetting `phase` here matters: if a touchcancel was missed mid-drag
+    // (the OS swallowed it because the user multi-touched, scrolled the URL
+    // bar, or backgrounded the tab), phase could otherwise stay 'dragging'
+    // and the next touchmove on the sheet would call preventDefault and
+    // appear to lock the page.
     const obs = new MutationObserver(() => {
       if (!detailEl.classList.contains('open')) {
-        detailEl.classList.remove('sheet-dragging');
+        phase = 'idle';
+        startY = currentY = lastMoveY = 0;
+        pct = 100;
+        startPct = 50;
+        detailEl.classList.remove('sheet-dragging', 'sheet-full');
         detailEl.style.removeProperty('--sheet-y');
+        detailEl.style.removeProperty('transform');
       }
     });
     obs.observe(detailEl, { attributes: true, attributeFilter: ['class'] });
