@@ -3335,21 +3335,16 @@ body:has(.sidebar.open) .mobile-toggle {
   .detail.sheet-full { --sheet-y: 0%; }
   .detail.sheet-dragging { transition: none !important; }
 
-  /* Belt-and-suspenders: when the sheet OR the off-canvas sidebar is
-     closed, force every descendant to ignore pointer events too. iOS
-     Safari has a long-standing quirk where children of a transformed-
-     off-screen `pointer-events: none` parent are still hit-tested at
-     their *layout* rect — which for both the sheet and the mobile
-     sidebar is the full viewport. After closing the detail panel that
-     leaves either of these silently capturing every tap on the map. */
+  /* When the sheet or sidebar is closed, force pointer-events: none on
+     the wrapper only (not the descendants — the universal selector
+     against the full restaurant list was 30+ seconds of style recalc
+     in Safari and locked the entire JS thread on every close).
+     iOS Safari respects pointer-events on the closed parent so descendant
+     hit-testing falls through to the map below. */
   .detail:not(.open),
-  .detail:not(.open) *,
-  .sidebar:not(.open),
-  .sidebar:not(.open) * {
+  .sidebar:not(.open) {
     pointer-events: none !important;
-    touch-action: auto !important;
   }
-  /* Mobile-toggle button lives outside the sidebar and is always tappable. */
   .mobile-toggle { pointer-events: auto !important; }
 
   /* Drag handle at the top of the sheet — wider hit area so the gesture
@@ -6048,36 +6043,27 @@ function selectRestaurant(id, opts = {}) {
 }
 
 function clearSelection() {
-  // DELIBERATELY MINIMAL: every previous variant of this function has
-  // somehow been part of an iOS Safari hang on close. Strip to the bare
-  // bones and schedule everything else (marker icon flip, list entry
-  // de-select) for the next tick so they can't run inside the touch
-  // handler's synchronous frame.
   const oldId = state.selectedId;
   state.selectedId = null;
+  if (oldId != null) {
+    // Surgical marker-icon flip (un-selected style) — cached icons make
+    // this near-free.
+    try {
+      const m = state.markers && state.markers.get ? state.markers.get(oldId) : null;
+      const r = state.restaurants && state.restaurants.find
+        ? state.restaurants.find(x => x.id === oldId) : null;
+      if (m && r) m.setIcon(makeIcon(r.status, false));
+    } catch (_) {}
+    // Drop `.selected` on the matching sidebar entry — no full list rebuild.
+    try {
+      const oldEntry = document.querySelector(`#list .entry[data-id="${oldId}"].selected`);
+      if (oldEntry) oldEntry.classList.remove('selected');
+    } catch (_) {}
+  }
   const detail = document.getElementById('detail');
   if (detail) {
     detail.classList.remove('open', 'sheet-full', 'sheet-dragging');
     try { detail.style.removeProperty('--sheet-y'); } catch (_) {}
-    if (detail.style.display === 'none') detail.style.removeProperty('display');
-  }
-  // Defer the cosmetic cleanup to the next event-loop tick. Whatever's
-  // happening synchronously during close on iOS Safari — Leaflet's
-  // setIcon DOM churn, the list-entry classList write, anything that
-  // touches paint — gets pushed off the critical path.
-  if (oldId != null) {
-    setTimeout(() => {
-      try {
-        const m = state.markers && state.markers.get ? state.markers.get(oldId) : null;
-        const r = state.restaurants && state.restaurants.find
-          ? state.restaurants.find(x => x.id === oldId) : null;
-        if (m && r) m.setIcon(makeIcon(r.status, false));
-      } catch (_) {}
-      try {
-        const oldEntry = document.querySelector(`#list .entry[data-id="${oldId}"].selected`);
-        if (oldEntry) oldEntry.classList.remove('selected');
-      } catch (_) {}
-    }, 0);
   }
 }
 
@@ -9163,24 +9149,11 @@ async function init() {
     document.addEventListener('pointermove', e => { if (e.pointerType !== 'touch' && phase !== 'idle') onMove(e); });
     document.addEventListener('pointerup', e => { if (e.pointerType !== 'touch' && phase !== 'idle') onEnd(); });
 
-    // When the detail closes (selectedId set to null), drop ALL drag state.
-    // Resetting `phase` here matters: if a touchcancel was missed mid-drag
-    // (the OS swallowed it because the user multi-touched, scrolled the URL
-    // bar, or backgrounded the tab), phase could otherwise stay 'dragging'
-    // and the next touchmove on the sheet would call preventDefault and
-    // appear to lock the page.
-    const obs = new MutationObserver(() => {
-      if (!detailEl.classList.contains('open')) {
-        phase = 'idle';
-        startY = currentY = lastMoveY = 0;
-        pct = 100;
-        startPct = 50;
-        detailEl.classList.remove('sheet-dragging', 'sheet-full');
-        detailEl.style.removeProperty('--sheet-y');
-        detailEl.style.removeProperty('transform');
-      }
-    });
-    obs.observe(detailEl, { attributes: true, attributeFilter: ['class'] });
+    // MutationObserver disabled: was causing instant Safari freeze on
+    // close. Drag state (phase + inline styles) is reset on touchend
+    // anyway, and the snap functions clear their own classes. The
+    // observer's role was belt-and-suspenders cleanup if a touchcancel
+    // was missed — but it was triggering a reentrant style-recalc storm.
 
     // Viewport rotated/resized → drop sheet state so desktop wins cleanly
     window.addEventListener('resize', () => {
