@@ -3335,18 +3335,22 @@ body:has(.sidebar.open) .mobile-toggle {
   .detail.sheet-full { --sheet-y: 0%; }
   .detail.sheet-dragging { transition: none !important; }
 
-  /* Belt-and-suspenders: when the sheet is closed, force every descendant
-     to ignore pointer events too. iOS Safari has a long-standing quirk
-     where children of a `pointer-events: none` parent that's been
-     translated off-screen are still hit-tested at their *layout* rect —
-     which for this sheet is the full viewport. That's the lock-up:
-     after a close, taps and pans hit the invisible sheet children
-     (header, close button, body) instead of the map underneath. */
+  /* Belt-and-suspenders: when the sheet OR the off-canvas sidebar is
+     closed, force every descendant to ignore pointer events too. iOS
+     Safari has a long-standing quirk where children of a transformed-
+     off-screen `pointer-events: none` parent are still hit-tested at
+     their *layout* rect — which for both the sheet and the mobile
+     sidebar is the full viewport. After closing the detail panel that
+     leaves either of these silently capturing every tap on the map. */
   .detail:not(.open),
-  .detail:not(.open) * {
+  .detail:not(.open) *,
+  .sidebar:not(.open),
+  .sidebar:not(.open) * {
     pointer-events: none !important;
     touch-action: auto !important;
   }
+  /* Mobile-toggle button lives outside the sidebar and is always tappable. */
+  .mobile-toggle { pointer-events: auto !important; }
 
   /* Drag handle at the top of the sheet — wider hit area so the gesture
      is forgiving. The whole top region (handle + header) gets
@@ -6062,45 +6066,24 @@ function clearSelection() {
       if (oldEntry) oldEntry.classList.remove('selected');
     } catch (_) {}
   }
-  // Slide the detail panel off-screen — CSS handles the actual animation.
+  // Slide the detail panel off-screen — CSS handles the animation via
+  // the transform + visibility transitions on `.detail` (no .open).
   const detail = document.getElementById('detail');
   if (detail) {
     detail.classList.remove('open', 'sheet-full', 'sheet-dragging');
-    // Belt-and-suspenders for mobile: explicitly push the sheet off-screen
-    // in case the inline --sheet-y override from a previous drag is still set.
     try { detail.style.removeProperty('--sheet-y'); } catch (_) {}
-    // After the slide-out transition (320ms) completes, take the sheet
-    // OUT of the layout entirely with `display: none`. Without this, iOS
-    // Safari keeps dispatching touch events to the still-mounted #detail
-    // (which has touchstart/move/end listeners for the swipe-to-dismiss
-    // gesture) — those handlers `preventDefault` and the map underneath
-    // never gets the touch, so the page feels frozen until reload.
-    if (detail._displayNoneTimer) clearTimeout(detail._displayNoneTimer);
-    detail._displayNoneTimer = setTimeout(() => {
-      // Only hide if we're still closed (user may have reopened it in <320ms)
-      if (!detail.classList.contains('open')) {
-        detail.style.display = 'none';
-      }
-      detail._displayNoneTimer = null;
-    }, 340);
+    // Also drop any leftover inline display:none from earlier builds so
+    // the next renderDetail() doesn't have to clear it.
+    if (detail.style.display === 'none') detail.style.removeProperty('display');
   }
 }
 
-// Undo the `display: none` we set after close so the next open can animate.
-// Called from renderDetail() before the panel becomes visible again.
+// No-op now that we don't apply inline display:none on close, but
+// renderDetail() still calls this. Kept as a hook for future use.
 function showDetailPanel() {
   const detail = document.getElementById('detail');
   if (!detail) return;
-  if (detail._displayNoneTimer) {
-    clearTimeout(detail._displayNoneTimer);
-    detail._displayNoneTimer = null;
-  }
-  if (detail.style.display === 'none') {
-    detail.style.removeProperty('display');
-    // Force a reflow so the browser registers the display change before the
-    // .open class adds the slide-in transform — otherwise the panel snaps in.
-    void detail.offsetWidth;
-  }
+  if (detail.style.display === 'none') detail.style.removeProperty('display');
 }
 
 // Top-level so the inline `onclick="closeDetailPanel(event)"` on the X button
