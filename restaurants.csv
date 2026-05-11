@@ -13,146 +13,146 @@ id,name,address,neighborhood,borough,lat,lng,cuisine,status,reservationLink,rese
 11,Baar Baar,29 E 21st St,Flatiron,Manhattan,40.739661,-73.988556,Indian,top-pick,https://www.opentable.com/r/baar-baar-new-york,,True
 12,Lord's,506 LaGuardia Pl,Greenwich Village,Manhattan,40.727695,-73.999462,British,top-pick,https://resy.com/cities/new-york-ny/venues/lords,,True
 13,Twin Tails,10 Columbus Circle,Columbus Circle,Manhattan,40.768364,-73.982641,Southeast Asian (Thai/Vietnamese),mixed,https://resy.com/cities/new-york-ny/venues/twin-tails,,True
-14,Cha Pa,314 W 52nd St,Midtown West,Manhattan,40.7638,-73.986076,Vietnamese / Asian,wishlist,,,True
-15,Bad Roman,10 Columbus Circle,Columbus Circle,Manhattan,40.768364,-73.982641,Italian-American,wishlist,,,True
-16,Dosa House Annapurna Bhavan,615 9th Ave,Hell's Kitchen,Manhattan,40.759552,-73.992143,South Indian / Dosa,wishlist,,,True
-17,Mission Chinese,45 Mott St,Chinatown,Manhattan,40.715266,-73.998832,Chinese-American,wishlist,,,True
-18,Dean's,213 6th Ave,SoHo,Manhattan,40.727515,-74.003414,British Coastal / Seafood,wishlist,,,True
-19,Musaafer,133 Duane St,Tribeca,Manhattan,40.716325,-74.007557,Indian,wishlist,,,True
-20,Wild Cherry,38 Commerce St,West Village,Manhattan,40.731261,-74.005313,American (Supper Club),wishlist,,Not Visited,True
-21,Eulalie,239 W Broadway,Tribeca,Manhattan,40.719588,-74.005816,French,wishlist,,No website; reservations by phone only at (646) 476-2380,True
-22,Borgo,124 E 27th St,Gramercy,Manhattan,40.742109,-73.98358,Italian,wishlist,,,True
-23,Crane Club,535 W 28th St,Chelsea,Manhattan,40.75174,-74.003773,Steakhouse,wishlist,,,True
-24,Le Veau d'Or,129 E 60th St,Upper East Side,Manhattan,40.763204,-73.968106,French Bistro (Classic),wishlist,,,True
+14,Cha Pa,314 W 52nd St,Midtown West,Manhattan,40.7638,-73.986076,Vietnamese / Asian,wishlist,,Walk-in / phone only: (212) 956-9300,True
+15,Bad Roman,10 Columbus Circle,Columbus Circle,Manhattan,40.768364,-73.982641,Italian-American,wishlist,https://www.opentable.com/r/bad-roman-new-york,,True
+16,Dosa House Annapurna Bhavan,615 9th Ave,Hell's Kitchen,Manhattan,40.759552,-73.992143,South Indian / Dosa,wishlist,,Walk-in / phone only: (212) 981-7000,True
+17,Mission Chinese,45 Mott St,Chinatown,Manhattan,40.715266,-73.998832,Chinese-American,wishlist,https://resy.com/cities/new-york-ny/venues/mission-chinese-food-chinatown,,True
+18,Dean's,213 6th Ave,SoHo,Manhattan,40.727515,-74.003414,British Coastal / Seafood,wishlist,https://resy.com/cities/new-york-ny/venues/deans,,True
+19,Musaafer,133 Duane St,Tribeca,Manhattan,40.716325,-74.007557,Indian,wishlist,https://www.opentable.com/r/musaafer-new-york-new-york-city,,True
+20,Wild Cherry,38 Commerce St,West Village,Manhattan,40.731261,-74.005313,American (Supper Club),wishlist,https://www.opentable.com/r/wild-cherry-new-york,Not Visited,True
+21,Eulalie,239 W Broadway,Tribeca,Manhattan,40.719588,-74.005816,French,wishlist,,Phone only: (646) 476-2380,True
+22,Borgo,124 E 27th St,Gramercy,Manhattan,40.742109,-73.98358,Italian,wishlist,https://resy.com/cities/new-york-ny/venues/borgo,,True
+23,Crane Club,535 W 28th St,Chelsea,Manhattan,40.75174,-74.003773,Steakhouse,wishlist,https://resy.com/cities/new-york-ny/venues/crane-club,,True
+24,Le Veau d'Or,129 E 60th St,Upper East Side,Manhattan,40.763204,-73.968106,French Bistro (Classic),wishlist,https://www.opentable.com/r/le-veau-dor-new-york,,True
 25,Tulcingo del Valle,665 10th Ave,Hell's Kitchen,Manhattan,40.762414,-73.992994,Mexican,disliked,,,True
 26,Jupiter,50 Rockefeller Plaza,Midtown,Manhattan,40.759559,-73.978241,New American / Pre-theater,loved,,,True
-27,Rice Thief,27-01 Jackson Ave,Long Island City,Queens,40.747764,-73.941068,Southeast Asian,wishlist,,,True
+27,Rice Thief,27-01 Jackson Ave,Long Island City,Queens,40.747764,-73.941068,Southeast Asian,wishlist,https://resy.com/cities/new-york-ny/venues/rice-thief,,True
 28,Meju,5-28 49th Ave,Long Island City,Queens,40.743586,-73.955216,Korean,wishlist,https://resy.com/cities/new-york-ny/venues/meju,,True
-29,Stars Wine Bar,139 E 12th St,East Village,Manhattan,40.732162,-73.988356,Wine Bar,wishlist,,Walk-in only,True
+29,Stars Wine Bar,139 E 12th St,East Village,Manhattan,40.732162,-73.988356,Wine Bar,wishlist,,Walk-in only (12 seats),True
 30,Cafe Commerce,964 Lexington Ave,Upper East Side,Manhattan,40.769386,-73.963142,New American,mixed,https://resy.com/cities/new-york-ny/venues/cafe-commerce,,True
 31,Yamada Kaiseki,13 E 20th St,Flatiron,Manhattan,40.739415,-73.990057,Japanese Kaiseki,wishlist,https://resy.com/cities/new-york-ny/venues/yamada,,True
-32,Lei,15-17 Doyers St,Chinatown,Manhattan,40.714595,-73.998267,Chinese / Wine Bar,wishlist,,,True
+32,Lei,15-17 Doyers St,Chinatown,Manhattan,40.714595,-73.998267,Chinese / Wine Bar,wishlist,https://resy.com/cities/new-york-ny/venues/lei,,True
 33,Semma,60 Greenwich Ave,West Village,Manhattan,40.736007,-74.000611,South Indian,wishlist,https://resy.com/cities/new-york-ny/venues/semma,,True
-34,Zou Zou,385 9th Ave,Hudson Yards,Manhattan,40.740861,-74.005057,Middle Eastern,wishlist,,,True
-35,Lavaux Wine Bar,630 Hudson St,West Village,Manhattan,40.738377,-74.005262,Swiss / Wine Bar,wishlist,,,True
-36,Limusina,441 9th Ave,Hudson Yards,Manhattan,40.753826,-73.996218,Mexican,wishlist,,,True
-37,Win Son Bakery,23 2nd Ave,East Village,Manhattan,40.724608,-73.990936,Taiwanese-American,wishlist,,,True
+34,Zou Zou,385 9th Ave,Hudson Yards,Manhattan,40.740861,-74.005057,Middle Eastern,wishlist,https://resy.com/cities/new-york-ny/venues/zou-zous,,True
+35,Lavaux Wine Bar,630 Hudson St,West Village,Manhattan,40.738377,-74.005262,Swiss / Wine Bar,wishlist,https://resy.com/cities/new-york-ny/venues/the-lavaux-swiss-wine-and-fondue-bar,,True
+36,Limusina,441 9th Ave,Hudson Yards,Manhattan,40.753826,-73.996218,Mexican,wishlist,https://www.opentable.com/r/limusina-new-york,,True
+37,Win Son Bakery,23 2nd Ave,East Village,Manhattan,40.724608,-73.990936,Taiwanese-American,wishlist,,Counter-service bakery — no reservations,True
 38,Cha Long,6 St Marks Pl,East Village,Manhattan,40.729108,-73.989557,Chinese / Tea,wishlist,,,True
-39,Los Mariscos,Chelsea Market,Chelsea,Manhattan,40.745158,-73.994648,Mexican Seafood,wishlist,,,True
-40,Christos Steakhouse,41-08 23rd Ave,Astoria,Queens,40.770359,-73.907428,Greek Steakhouse,wishlist,,,True
-41,La Tête d'Or,318 Park Ave South,Flatiron,Manhattan,40.740726,-73.986208,French Steakhouse,wishlist,,,True
-42,Adda,197 First Ave,East Village,Manhattan,40.730221,-73.983694,Indian,wishlist,https://resy.com/cities/new-york-ny/venues/adda-indian-canteen,,True
-43,Saint Urban,43 E 20th St,Flatiron,Manhattan,40.738825,-73.988435,New American,wishlist,,,True
-44,The Dynamo Room,2 Pennsylvania Plaza,Midtown,Manhattan,40.750128,-73.992601,American,wishlist,,,True
+39,Los Mariscos,Chelsea Market,Chelsea,Manhattan,40.745158,-73.994648,Mexican Seafood,wishlist,,Chelsea Market food stall — walk-in only,True
+40,Christos Steakhouse,41-08 23rd Ave,Astoria,Queens,40.770359,-73.907428,Greek Steakhouse,wishlist,https://www.opentable.com/christos-steak-house,,True
+41,La Tête d'Or,318 Park Ave South,Flatiron,Manhattan,40.740726,-73.986208,French Steakhouse,wishlist,https://resy.com/cities/new-york-ny/venues/la-tete-dor,,True
+42,Adda,197 First Ave,East Village,Manhattan,40.730221,-73.983694,Indian,wishlist,https://resy.com/cities/new-york-ny/venues/ADDA,,True
+43,Saint Urban,43 E 20th St,Flatiron,Manhattan,40.738825,-73.988435,New American,wishlist,https://resy.com/cities/new-york-ny/venues/saint-urban-wine-bar,,True
+44,The Dynamo Room,2 Pennsylvania Plaza,Midtown,Manhattan,40.750128,-73.992601,American,wishlist,https://resy.com/cities/new-york-ny/venues/the-dynamo-room,,True
 45,Bartolo,303 Broome St,Lower East Side,Manhattan,40.718702,-73.992384,Italian,loved,,,True
 46,Lex Yard,560 Lexington Ave,Midtown East,Manhattan,40.756687,-73.972412,New American,mixed,https://resy.com/cities/new-york-ny/venues/lex-yard,,True
 47,Cho Dang Gol,55 W 35th St,Midtown,Manhattan,40.750171,-73.986344,Korean Tofu,mixed,,,True
 48,Blue Blossom,108 W 39th St,Midtown,Manhattan,40.753107,-73.986144,Chinese Dumplings,loved,,,True
-49,Sopo Korean Eats,463 7th Ave,Midtown,Manhattan,40.751786,-73.989832,Korean Fast Casual,wishlist,,,True
-50,188 Bakery Cuchifritos,158 E 188th St,South Bronx,Bronx,40.861518,-73.898408,Puerto Rican / Dominican,wishlist,,,True
+49,Sopo Korean Eats,463 7th Ave,Midtown,Manhattan,40.751786,-73.989832,Korean Fast Casual,wishlist,,Counter-service — no reservations,True
+50,188 Bakery Cuchifritos,158 E 188th St,South Bronx,Bronx,40.861518,-73.898408,Puerto Rican / Dominican,wishlist,,Bakery / cuchifritos — walk-in only,True
 51,Sushi Akira,317 E 75th St,Upper East Side,Manhattan,40.770531,-73.955813,Japanese Omakase,mixed,,,True
 52,Sunn's,139 Division St,Lower East Side,Manhattan,40.714433,-73.990984,Korean Banchan,wishlist,https://resy.com/cities/new-york-ny/venues/sunns,,True
-53,Le Café Louis Vuitton,1 E 57th St,Midtown,Manhattan,40.762981,-73.97357,French,wishlist,,,True
-54,Sinsa,95 2nd Ave,East Village,Manhattan,40.727236,-73.98901,Korean Wine Bar,wishlist,,,True
+53,Le Café Louis Vuitton,1 E 57th St,Midtown,Manhattan,40.762981,-73.97357,French,wishlist,https://resy.com/cities/new-york-ny/venues/le-cafe-louis-vuitton,,True
+54,Sinsa,95 2nd Ave,East Village,Manhattan,40.727236,-73.98901,Korean Wine Bar,wishlist,,Permanently closed (Nov 2025),True
 55,Rosella,137 Ave A,East Village,Manhattan,40.727099,-73.982963,Japanese Sushi (Sustainable),wishlist,https://resy.com/cities/new-york-ny/venues/rosella,,True
 56,BKK New York,238 W 56th St,Midtown,Manhattan,40.765573,-73.982836,Thai Street Food,mixed,,,True
 57,Golden Hof,16 W 48th St,Rockefeller Center,Manhattan,40.757547,-73.979309,Korean,mixed,,,True
 58,Mitr Thai,37 W 46th St,Midtown,Manhattan,40.756872,-73.980428,Thai,loved,,,True
 59,Animo!,1004 2nd Ave,Midtown East,Manhattan,40.756797,-73.966812,Mexican,loved,,,True
-60,Theodora,7 Greene Ave,Fort Greene,Brooklyn,40.685996,-73.973034,Seafood / Mediterranean,wishlist,,,True
+60,Theodora,7 Greene Ave,Fort Greene,Brooklyn,40.685996,-73.973034,Seafood / Mediterranean,wishlist,https://resy.com/cities/new-york-ny/venues/theodora,,True
 61,Danny and Coop's Cheesesteaks,151 Avenue A,East Village,Manhattan,40.72765,-73.982681,American / Cheesesteak,loved,,,True
-62,Acru,79 MacDougal St,Greenwich Village,Manhattan,40.728848,-74.001772,New American / Tasting menu,wishlist,,,True
+62,Acru,79 MacDougal St,Greenwich Village,Manhattan,40.728848,-74.001772,New American / Tasting menu,wishlist,,Permanently closed,True
 63,Chatti,252 W 37th St,Midtown,Manhattan,40.753689,-73.991359,Indian (Kerala),mixed,,,True
-64,Azara Kitchen,348 Lenox Ave,Harlem,Manhattan,40.809255,-73.943925,West African / Nigerian,wishlist,,,True
-65,Haideri Chai,72-08 Broadway,Jackson Heights,Queens,40.747431,-73.893507,Chai / Indian,wishlist,,,True
-66,Caleta,80 Avenue C,Alphabet City,Manhattan,40.723087,-73.979396,Latin / Seafood,wishlist,,Walk-in only,True
-67,Kiko,307 Spring St,Hudson Square,Manhattan,40.726159,-74.008441,,wishlist,,,True
-68,Carnitas Ramirez,210 E 3rd St,Lower East Side,Manhattan,40.722524,-73.982844,Mexican,wishlist,,,True
-69,Longjiang Pork Feet Rice,121 Mott St,Chinatown,Manhattan,40.71803,-73.997128,Chinese,wishlist,,,True
+64,Azara Kitchen,348 Lenox Ave,Harlem,Manhattan,40.809255,-73.943925,West African / Nigerian,wishlist,https://www.opentable.com/r/azara-kitchen-new-york,,True
+65,Haideri Chai,72-08 Broadway,Jackson Heights,Queens,40.747431,-73.893507,Chai / Indian,wishlist,,Chai window — walk-in only: (332) 600-9915,True
+66,Caleta,80 Avenue C,Alphabet City,Manhattan,40.723087,-73.979396,Latin / Seafood,wishlist,,Permanently closed (Mar 2026),True
+67,Kiko,307 Spring St,Hudson Square,Manhattan,40.726159,-74.008441,,wishlist,https://resy.com/cities/new-york-ny/venues/kiko,,True
+68,Carnitas Ramirez,210 E 3rd St,Lower East Side,Manhattan,40.722524,-73.982844,Mexican,wishlist,,Counter-service taqueria — walk-in only,True
+69,Longjiang Pork Feet Rice,121 Mott St,Chinatown,Manhattan,40.71803,-73.997128,Chinese,wishlist,,Manhattan location closed; Flushing location still open,True
 70,Hyderabadi Zaiqa,184 Lexington Ave,Murray Hill,Manhattan,40.744877,-73.981171,Indian (Hyderabadi),loved,,,True
 71,Golden Wuish,22 Pell St,Chinatown,Manhattan,40.714894,-73.998173,Chinese (Peking Duck),wishlist,,,True
 72,Octo,21 Spring St,Nolita,Manhattan,40.721631,-73.995246,Chinese (Peking Duck),disliked,,,True
 73,Din Tai Fung,1633 Broadway,Midtown,Manhattan,40.762005,-73.984229,Taiwanese / Dumplings,mixed,https://resy.com/cities/new-york-ny/venues/din-tai-fung-new-york-city,,True
 74,Birdbox,245 W 46th St,,Manhattan,40.759076,-73.986029,Fried Chicken,mixed,,,True
 75,Bridges,9 Chatham Sq,Chinatown,Manhattan,40.713951,-73.998016,French / Fine dining,wishlist,https://resy.com/cities/new-york-ny/venues/bridges,,True
-76,Bungalow,122 1st Ave,East Village,Manhattan,40.727106,-73.985362,Indian,wishlist,https://resy.com/cities/new-york-ny/venues/bungalow,,True
+76,Bungalow,122 1st Ave,East Village,Manhattan,40.727106,-73.985362,Indian,wishlist,https://resy.com/cities/new-york-ny/venues/bungalow-ny,,True
 77,Penny,90 E 10th St,East Village,Manhattan,40.730889,-73.989678,New American,mixed,,,True
 78,Wine Bar Elvis,32 E 32nd St,Koreatown,Manhattan,40.746043,-73.983431,Wine Bar,wishlist,,,True
 79,Lungi,1136 First Ave,Upper East Side,Manhattan,40.761665,-73.960147,South Indian (Tamil / Chettinad),wishlist,https://resy.com/cities/new-york-ny/venues/lungi,,True
 80,Santi,11 E 53rd St,Midtown East,Manhattan,40.760507,-73.974484,Italian Seafood,mixed,,,True
 81,Jaba,230 E 58th St,Midtown East,Manhattan,40.760253,-73.965841,Taiwanese,wishlist,https://resy.com/cities/new-york-ny/venues/jaba,,True
-82,RAON,100 E 19th St,Flatiron,Manhattan,40.737505,-73.987821,Korean (Kimchi counter),wishlist,,,True
+82,RAON,100 E 19th St,Flatiron,Manhattan,40.737505,-73.987821,Korean (Kimchi counter),wishlist,https://resy.com/cities/new-york-ny/venues/raon-nyc,,True
 83,Bodai,135 E 50th St,Midtown,Manhattan,40.756448,-73.97172,Chinese Vegetarian / Tasting menu,disliked,https://resy.com/cities/new-york-ny/venues/bodai,,True
-84,Paris Bar,120 W 57th St,Midtown,Manhattan,40.764589,-73.978415,French Bistro,wishlist,,,True
-85,Armani Ristorante,760 Madison Ave,Upper East Side,Manhattan,40.767661,-73.968734,Italian,wishlist,,,True
-86,Le Bar Pénélope,14 E 60th St,Upper East Side,Manhattan,40.764407,-73.971664,Bar / Wine Bar,wishlist,,,True
+84,Paris Bar,120 W 57th St,Midtown,Manhattan,40.764589,-73.978415,French Bistro,wishlist,https://www.opentable.com/r/paris-bar-new-york,,True
+85,Armani Ristorante,760 Madison Ave,Upper East Side,Manhattan,40.767661,-73.968734,Italian,wishlist,https://resy.com/cities/new-york-ny/venues/armani-ristorante-ny,,True
+86,Le Bar Pénélope,14 E 60th St,Upper East Side,Manhattan,40.764407,-73.971664,Bar / Wine Bar,wishlist,https://resy.com/cities/new-york-ny/venues/le-bar-penelope,,True
 87,Kochi,652 10th Ave,Hell's Kitchen,Manhattan,40.762019,-73.993514,Korean (Skewers / Tasting),wishlist,https://resy.com/cities/new-york-ny/venues/kochi,,True
 88,Spice Brothers,110 St Marks Pl,East Village,Manhattan,40.726952,-73.984322,Middle Eastern / Shawarma,disliked,,,True
 89,Foxface,189 Avenue A,East Village,Manhattan,40.728999,-73.981692,Sandwiches,loved,,,True
 90,Jō,127 E 34th St,Murray Hill,Manhattan,40.746692,-73.979999,Japanese Seafood,loved,https://resy.com/cities/new-york-ny/venues/jo,,True
-91,Silvana,300 W 116th St,Harlem,Manhattan,40.804409,-73.955733,Mediterranean / Bar,wishlist,,Monday nights — blues music,True
-92,Grandma's Home,56 W 22nd St,Flatiron,Manhattan,40.741838,-73.992885,American Comfort,wishlist,,,True
+91,Silvana,300 W 116th St,Harlem,Manhattan,40.804409,-73.955733,Mediterranean / Bar,wishlist,,Phone only: (646) 692-4935,True
+92,Grandma's Home,56 W 22nd St,Flatiron,Manhattan,40.741838,-73.992885,American Comfort,wishlist,https://resy.com/cities/new-york-ny/venues/grandmas-home,,True
 93,Veerays,213 E 45th St,Midtown East,Manhattan,40.752591,-73.972293,Indian (Tandoori / Game),disliked,,,True
-94,Fulgurances Laundromat,114 Franklin St,Greenpoint,Brooklyn,40.728659,-73.957213,French / Wine Bar,wishlist,,Closed Sunday,True
-95,Melba's Grand Central,Grand Central,Midtown,Manhattan,40.7547,-73.9762,Southern,wishlist,,,True
-96,Bites of Xi'an,88 2nd Ave,East Village,Manhattan,40.726862,-73.988734,Chinese (Xi'an),wishlist,,,True
+94,Fulgurances Laundromat,114 Franklin St,Greenpoint,Brooklyn,40.728659,-73.957213,French / Wine Bar,wishlist,https://resy.com/cities/new-york-ny/venues/fulgurances-bk,Closed Sunday,True
+95,Melba's Grand Central,Grand Central,Midtown,Manhattan,40.7547,-73.9762,Southern,wishlist,,Counter-service in Grand Central — walk-in only,True
+96,Bites of Xi'an,88 2nd Ave,East Village,Manhattan,40.726862,-73.988734,Chinese (Xi'an),wishlist,,Fast-casual counter — walk-in only,True
 97,Lilia,567 Union Ave,Williamsburg,Brooklyn,40.717616,-73.952401,Italian,wishlist,https://resy.com/cities/new-york-ny/venues/lilia,,True
 98,Ilis,150 Green St,Greenpoint,Brooklyn,40.733456,-73.955573,Danish / New Nordic,wishlist,https://resy.com/cities/new-york-ny/venues/ilis,,True
 99,Tolo,28 Canal St,Chinatown,Manhattan,40.714318,-73.990512,Chinese / Wine,wishlist,https://resy.com/cities/new-york-ny/venues/tolo,,True
 100,Sichuan Mountain House,23 St Marks Pl,East Village / Midtown,Manhattan,40.729122,-73.988578,Sichuan Chinese,loved,,,True
-101,Oiji Mi,17 W 19th St,Flatiron,Manhattan,40.739648,-73.992422,Korean,wishlist,https://resy.com/cities/new-york-ny/venues/oiji-mi-bom,,True
+101,Oiji Mi,17 W 19th St,Flatiron,Manhattan,40.739648,-73.992422,Korean,wishlist,https://resy.com/cities/new-york-ny/venues/oiji-mi,,True
 102,Monsieur Bistro,853 Lexington Ave,Upper East Side,Manhattan,40.765599,-73.965443,French Bistro,mixed,,,True
 103,Maison Barnes (Café Boulud),100 E 63rd St,Upper East Side,Manhattan,40.765154,-73.967579,French,disliked,https://www.opentable.com/r/cafe-boulud-new-york,,True
 104,Nasrin's Kitchen,35 W 57th St,Midtown,Manhattan,40.76395,-73.975894,Middle Eastern / Persian,mixed,,,True
 105,Hutong,731 Lexington Ave,Midtown East,Manhattan,40.761883,-73.968258,Chinese,disliked,,,True
-106,Kono,46 Bowery,Chinatown,Manhattan,40.715806,-73.996959,Japanese Omakase,wishlist,https://exploretock.com/kono,,True
-107,Sip & Guzzle,29 Cornelia St,West Village,Manhattan,40.73152,-74.002486,Bar / Cocktails,wishlist,,,True
+106,Kono,46 Bowery,Chinatown,Manhattan,40.715806,-73.996959,Japanese Omakase,wishlist,https://resy.com/cities/new-york-ny/venues/kono,,True
+107,Sip & Guzzle,29 Cornelia St,West Village,Manhattan,40.73152,-74.002486,Bar / Cocktails,wishlist,https://resy.com/cities/new-york-ny/venues/guzzle,,True
 108,Planta Queen,15 W 27th St,NoMad,Manhattan,40.744424,-73.988345,Vegan,mixed,,,True
 109,Omakaseed,132 W 47th St,Midtown,Manhattan,40.758416,-73.98328,Vegan Omakase,wishlist,https://exploretock.com/omakaseed,,True
-110,Masalawala,365 5th Ave,Park Slope,Brooklyn,40.671253,-73.984285,Indian,wishlist,,,True
-111,Hav & Mar,245 10th Ave,Meatpacking,Manhattan,40.748779,-74.003817,Seafood / Raw bar,wishlist,,,True
-112,OM Real Indian Food,1644 2nd Ave,Upper East Side (btn 82nd & 83rd),Manhattan,40.777341,-73.951926,Indian,wishlist,,,True
+110,Masalawala,365 5th Ave,Park Slope,Brooklyn,40.671253,-73.984285,Indian,wishlist,https://resy.com/cities/new-york-ny/venues/masalawala,,True
+111,Hav & Mar,245 10th Ave,Meatpacking,Manhattan,40.748779,-74.003817,Seafood / Raw bar,wishlist,https://resy.com/cities/new-york-ny/venues/hav-and-mar,,True
+112,OM Real Indian Food,1644 2nd Ave,Upper East Side (btn 82nd & 83rd),Manhattan,40.777341,-73.951926,Indian,wishlist,https://www.opentable.com/om-real-indian-food,,True
 113,Hamburger America,51 MacDougal St,Greenwich Village,Manhattan,40.727937,-74.00244,Burgers / Luncheonette,loved,,,True
-114,The Bazaar by José Andrés,25 W 28th St,NoMad,Manhattan,40.745476,-73.988917,Spanish / Creative,wishlist,,,True
-115,Turk's Inn,234 Starr St,Bushwick,Brooklyn,40.705556,-73.922348,Turkish / Supper club,wishlist,,,True
-116,Cauldron Chicken,190 Bleecker St,West Village,Manhattan,40.729101,-74.001515,Fried Chicken,wishlist,,,True
+114,The Bazaar by José Andrés,25 W 28th St,NoMad,Manhattan,40.745476,-73.988917,Spanish / Creative,wishlist,https://www.opentable.com/r/bazaar-meat-by-jose-andres-new-york,,True
+115,Turk's Inn,234 Starr St,Bushwick,Brooklyn,40.705556,-73.922348,Turkish / Supper club,wishlist,https://resy.com/cities/new-york-ny/venues/the-turks-inn,,True
+116,Cauldron Chicken,190 Bleecker St,West Village,Manhattan,40.729101,-74.001515,Fried Chicken,wishlist,,Walk-in / phone only: (646) 869-8888,True
 117,Floating Mountain,31 Howard St,SoHo,Manhattan,40.719551,-74.00079,Tea Ceremony,wishlist,,,True
-118,Okdongsik,Midtown,Midtown,Manhattan,40.759924,-73.980419,Korean,wishlist,,,True
-119,Upon the Palace,Tribeca,Tribeca,Manhattan,40.720115,-74.010134,Imperial Chinese,wishlist,,,True
+118,Okdongsik,Midtown,Midtown,Manhattan,40.759924,-73.980419,Korean,wishlist,https://resy.com/cities/new-york-ny/venues/okdongsik,,True
+119,Upon the Palace,Tribeca,Tribeca,Manhattan,40.720115,-74.010134,Imperial Chinese,wishlist,https://resy.com/cities/new-york-ny/venues/upon-the-palace,,True
 120,Prawnaholic Collections (Urban Hawker),135 W 50th St,Midtown,Manhattan,40.760849,-73.98241,Singaporean / Southeast Asian,disliked,,,True
 121,Tradisyon,790 9th Ave,Hell's Kitchen,Manhattan,40.764899,-73.987544,Filipino Fast Casual,disliked,,,True
 122,Restaurant Le B,283 W 12th St,West Village,Manhattan,40.737677,-74.004008,Burgers / French,disliked,,,True
-123,Mokyo,109 St Marks Pl,East Village,Manhattan,40.727158,-73.983913,Korean Tapas,wishlist,,,True
-124,Jeffrey's Grocery,172 Waverly Pl,West Village,Manhattan,40.734003,-74.001375,Seafood / Raw bar,wishlist,,Walk-in,True
-125,Seng Feng BBQ,Bowne St,Flushing,Queens,40.762149,-73.824945,Skewers / Chinese BBQ,wishlist,,,True
+123,Mokyo,109 St Marks Pl,East Village,Manhattan,40.727158,-73.983913,Korean Tapas,wishlist,https://resy.com/cities/new-york-ny/venues/mokyo,,True
+124,Jeffrey's Grocery,172 Waverly Pl,West Village,Manhattan,40.734003,-74.001375,Seafood / Raw bar,wishlist,https://resy.com/cities/new-york-ny/venues/jeffreys-grocery,Walk-in,True
+125,Seng Feng BBQ,Bowne St,Flushing,Queens,40.762149,-73.824945,Skewers / Chinese BBQ,wishlist,,Walk-in / phone only: (718) 888-9556,True
 126,RAF's,290 Elizabeth St,Nolita,Manhattan,40.724686,-73.993152,New American,loved,,,True
 127,Cafe Zaffri,701 8th Ave,Midtown,Manhattan,40.758756,-73.988918,New American,loved,,,True
 128,Urban Hawker,135 W 50th St,Midtown,Manhattan,40.760849,-73.98241,Singaporean Food Hall,loved,,,True
-129,Dame,87 MacDougal St,Greenwich Village,Manhattan,40.729055,-74.001427,British Seafood,wishlist,,Walk-in only Monday nights — line at 4pm; names taken at 5:30pm; closed Sunday / Walk-in (Mon nights),True
-130,Quatorze,14 E 14th St,Union Square,Manhattan,40.735671,-73.992992,French Bistro,wishlist,,,True
-131,Saito,72 Kenmare St,Nolita,Manhattan,40.720995,-73.996396,Japanese,wishlist,,,True
+129,Dame,87 MacDougal St,Greenwich Village,Manhattan,40.729055,-74.001427,British Seafood,wishlist,https://resy.com/cities/new-york-ny/venues/dame-new-york,Walk-in only Monday nights — line at 4pm; names taken at 5:30pm; closed Sunday / Walk-in (Mon nights),True
+130,Quatorze,14 E 14th St,Union Square,Manhattan,40.735671,-73.992992,French Bistro,wishlist,https://resy.com/cities/new-york-ny/venues/quatorze,,True
+131,Saito,72 Kenmare St,Nolita,Manhattan,40.720995,-73.996396,Japanese,wishlist,,Possibly closed (Feb 2026),True
 132,53 W 53,53 W 53rd St,Midtown,Manhattan,40.761599,-73.978371,Chinese,disliked,,,True
 133,La Milagrosa,149 E 116th St,East Harlem,Manhattan,40.798697,-73.941231,Bar / Agave / Tequila,mixed,,,True
-134,PDT (Please Don't Tell),113 St Marks Pl,East Village,Manhattan,40.727119,-73.983748,Cocktail Bar / Speakeasy,wishlist,https://exploretock.com/pdtnyc,,True
+134,PDT (Please Don't Tell),113 St Marks Pl,East Village,Manhattan,40.727119,-73.983748,Cocktail Bar / Speakeasy,wishlist,https://resy.com/cities/new-york-ny/venues/pdt,,True
 135,La Pizza Fresca,31 E 20th St,Flatiron,Manhattan,40.739,-73.988927,Italian / Pizza,disliked,,,True
-136,Gotham West Market,600 11th Ave,Hell's Kitchen,Manhattan,40.762349,-73.996947,Food Hall,wishlist,,,True
+136,Gotham West Market,600 11th Ave,Hell's Kitchen,Manhattan,40.762349,-73.996947,Food Hall,wishlist,,Permanently closed (end of 2024),True
 137,Little Mad,110 Madison Ave,Gramercy,Manhattan,40.745065,-73.985239,Korean-American,disliked,https://resy.com/cities/new-york-ny/venues/little-mad,,True
-138,Jongro Korean BBQ,22 W 32nd St,Koreatown,Manhattan,40.747631,-73.986861,Korean BBQ,wishlist,,,True
-139,Pastrami Queen,1125 Lexington Ave,Upper East Side,Manhattan,40.774393,-73.959155,Jewish Deli,wishlist,,Breakfast or lunch,True
+138,Jongro Korean BBQ,22 W 32nd St,Koreatown,Manhattan,40.747631,-73.986861,Korean BBQ,wishlist,https://resy.com/cities/new-york-ny/venues/jongro-bbq,,True
+139,Pastrami Queen,1125 Lexington Ave,Upper East Side,Manhattan,40.774393,-73.959155,Jewish Deli,wishlist,,Counter-service deli — walk-in only: (212) 734-1500,True
 140,Rezdôra,27 E 20th St,Flatiron,Manhattan,40.739053,-73.989064,Emilian Italian,wishlist,https://resy.com/cities/new-york-ny/venues/rezdora,,True
 141,Tuome,536 E 5th St,East Village,Manhattan,40.724038,-73.982928,Chinese-American,disliked,https://resy.com/cities/new-york-ny/venues/tuome,,True
-142,ROKC,3452 Broadway,Hamilton Heights,Manhattan,40.823623,-73.952175,Japanese Ramen,wishlist,,,True
+142,ROKC,3452 Broadway,Hamilton Heights,Manhattan,40.823623,-73.952175,Japanese Ramen,wishlist,,Walk-in only: (332) 217-8755,True
 143,Hakata Tonton,43 Mott St,Chinatown,Manhattan,40.715234,-73.998998,Japanese (Kyushu soul food),wishlist,https://resy.com/cities/new-york-ny/venues/hakata-tonton,,True
-144,Van Da,234 E 4th St,East Village,Manhattan,40.723326,-73.983129,Vietnamese,wishlist,,,True
+144,Van Da,234 E 4th St,East Village,Manhattan,40.723326,-73.983129,Vietnamese,wishlist,https://resy.com/cities/new-york-ny/venues/van-da,,True
 145,Pippali,129 E 27th St,Kips Bay,Manhattan,40.742415,-73.98325,Indian,disliked,,,True
 146,Sushi Lab,132 W 47th St,Midtown West,Manhattan,40.758416,-73.98328,Japanese Omakase,disliked,,,True
 147,Saar,241 W 51st St,Midtown,Manhattan,40.76269,-73.984834,Indian,loved,https://resy.com/cities/new-york-ny/venues/saar,,True
 148,Wan Wan,212 E 10th St,East Village,Manhattan,40.729278,-73.986093,Thai,disliked,,,True
 149,The Musket Room,265 Elizabeth St,Nolita,Manhattan,40.723943,-73.993877,Modern Global,loved,https://resy.com/cities/new-york-ny/venues/the-musket-room,,True
 150,Sushi Noz,181 E 78th St,Upper East Side,Manhattan,40.773856,-73.958135,Japanese Omakase,loved,https://exploretock.com/sushinoz,,True
-151,Carne Mare,89 South St,Financial District,Manhattan,40.705735,-74.002152,Seafood / Italian,wishlist,,,True
+151,Carne Mare,89 South St,Financial District,Manhattan,40.705735,-74.002152,Seafood / Italian,wishlist,https://resy.com/cities/new-york-ny/venues/carne-mare,,True
 152,JOJI,One Vanderbilt,Midtown,Manhattan,40.752737,-73.978298,Japanese Omakase,upcoming,https://exploretock.com/joji,,True
-153,Altro Paradiso,234 Spring St,SoHo,Manhattan,40.725492,-74.004894,Italian,wishlist,,,True
+153,Altro Paradiso,234 Spring St,SoHo,Manhattan,40.725492,-74.004894,Italian,wishlist,https://resy.com/cities/new-york-ny/venues/altro-paradiso,,True
 154,Corner Bar,9 Orchard St,Lower East Side,Manhattan,40.714791,-73.992062,New American / Brasserie,loved,,,True
 155,Le Dive,37 Canal St,Lower East Side,Manhattan,40.714744,-73.990958,Natural Wine Bar,wishlist,,,True
 156,Le Rock,45 Rockefeller Plaza,Midtown,Manhattan,40.759509,-73.977958,French Brasserie,wishlist,,,True

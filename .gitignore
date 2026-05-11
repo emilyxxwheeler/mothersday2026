@@ -13,3 +13,16 @@
 *.swp
 .idea/
 .vscode/
+.vercel
+.playwright-mcp/
+
+# Working/source images not used by the site
+apple-touch.png
+og-image.png
+open-graph.png
+jane-source.png
+
+# Audit & preview screenshots
+audit-*.png
+iphone-view.png
+hamburger-closeup.png
