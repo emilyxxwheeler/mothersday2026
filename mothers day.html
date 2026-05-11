@@ -7595,6 +7595,9 @@ function maybeStartOnboarding() {
   if (IS_VIEW_ONLY) return;
   if (state.overrides.onboardingCompleted) return;
   const ob = state.overrides.onboardingState;
+  // If the user paused onboarding by closing the compare modal, don't
+  // pop it back open on every load. They can resume from settings.
+  if (ob && ob.paused) return;
   if (ob && ob.currentBucket) {
     if (ob.bucketsCompleted?.includes(ob.currentBucket) && !ob.inProgressInsertion
         && !ob.remainingIds?.length && !ob.deferredIds?.length) {
@@ -7867,7 +7870,17 @@ function dismissOnboardingFinal() {
 
 function closeOnboardingComparison() {
   document.getElementById('compareModal').classList.remove('open');
-  toast('Paused — reload to resume where you left off.');
+  // Mark onboarding as paused so the next page load (or detail-panel close)
+  // doesn't auto-pop the comparison modal back on top of the map. Without
+  // this flag the user closes the modal, taps a pin, closes the detail,
+  // and is greeted by the same modal again — which looks exactly like the
+  // page is frozen.
+  const ob = state.overrides.onboardingState;
+  if (ob) {
+    ob.paused = true;
+    saveOverrides();
+  }
+  toast('Paused — open settings to resume onboarding.');
 }
 
 // Test-only: skip remaining comparisons by assigning random scores within each
