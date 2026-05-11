@@ -1807,8 +1807,7 @@ body.view-only .status-picker,
 body.view-only #onboardingOverlay {
   display: none !important;
 }
-body.view-only .notes-textarea,
-body.view-only .notes-meta-input { pointer-events: none; background: transparent; border-color: transparent; }
+body.view-only .notes-textarea { pointer-events: none; background: transparent; border-color: transparent; }
 
 /* Update Rankings pill needs breathing room from the Distinctions chips
    above; without margin-top it sits flush against them and looks cramped. */
@@ -2218,57 +2217,6 @@ body.view-only .notes-meta-input { pointer-events: none; background: transparent
 .action-btn.danger:hover { color: var(--vermillion); background: rgba(184,51,42,0.04); }
 
 /* ======== Editable Notes ======== */
-/* Rating + visitedWith + Must Order are inline-editable inputs above the
-   notes textarea. Style the inputs to feel like meta text at rest, with a
-   subtle hover/focus border. */
-.notes-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  flex-wrap: wrap;
-}
-.notes-meta-label {
-  font-family: var(--sans);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--sepia);
-  flex-shrink: 0;
-}
-/* Detail-panel inline inputs (Rating / Who / Must Order) — same liquid-glass
-   recipe as the modal .input so the editing experience feels consistent
-   across the site. */
-.notes-meta-input {
-  flex: 1;
-  min-width: 0;
-  padding: 8px 12px;
-  font-family: var(--serif);
-  font-size: 13px;
-  color: var(--ink);
-  background: var(--glass-bg-soft);
-  border: none;
-  border-radius: 12px;
-  outline: none;
-  transition: all .15s;
-  backdrop-filter: blur(10px) saturate(1.5);
-  -webkit-backdrop-filter: blur(10px) saturate(1.5);
-  box-shadow: var(--glass-shine), 0 1px 3px rgba(13,21,48,0.05);
-}
-.notes-meta-input::placeholder {
-  font-style: italic;
-  color: var(--sepia-light);
-}
-.notes-meta-input:hover {
-  background: var(--glass-bg);
-}
-.notes-meta-input:focus {
-  background: var(--glass-bg-strong);
-  box-shadow: var(--glass-shine), 0 0 0 3px rgba(28,79,170,0.16);
-}
-.notes-meta-input-wide { flex: 1 1 100%; }
-
 /* Notes textarea — matches the modal .textarea (12px radius, glass-bg-soft,
    blue-glow focus, no outline). */
 .notes-textarea {
@@ -5417,21 +5365,9 @@ function renderDetail() {
     </div>`);
   }
 
-  // Notes section — fully editable. Rating + With + Must Order + Notes are all
-  // inline-editable inputs that auto-save on blur via applyMod.
-  const ratingVal = (r.rating && r.rating !== 'Not Visited') ? r.rating : '';
+  // Notes section — single editable textarea, auto-saves on blur via applyMod.
   body.push(`<div class="detail-section">
     <h4>Notes</h4>
-    <div class="notes-meta-row">
-      <label class="notes-meta-label">Rating</label>
-      <input type="text" class="notes-meta-input" data-field="rating" placeholder="How was it?" value="${escapeAttr(ratingVal)}">
-      <label class="notes-meta-label">With</label>
-      <input type="text" class="notes-meta-input" data-field="visitedWith" placeholder="Who?" value="${escapeAttr(r.visitedWith || '')}">
-    </div>
-    <div class="notes-meta-row">
-      <label class="notes-meta-label">Must Order</label>
-      <input type="text" class="notes-meta-input notes-meta-input-wide" data-field="mustOrder" placeholder="Dishes worth coming back for…" value="${escapeAttr(r.mustOrder || '')}">
-    </div>
     <textarea class="notes-textarea" id="notesTextarea" placeholder="Click to add notes…">${escapeHtml(r.notes || '')}</textarea>
   </div>`);
 
@@ -5551,24 +5487,6 @@ function renderDetail() {
     btn.addEventListener('click', () => {
       const id = Number(btn.dataset.id);
       if (Number.isFinite(id)) startRerank(id);
-    });
-  });
-
-  // Wire up the small inline inputs for rating / visitedWith / mustOrder.
-  // Each saves on blur or Enter, just like the notes textarea.
-  detailBodyEl.querySelectorAll('.notes-meta-input').forEach(input => {
-    const field = input.dataset.field;
-    let last = input.value;
-    const commit = () => {
-      const v = input.value.trim();
-      if (v === last) return;
-      applyMod(r.id, { [field]: v });
-      last = v;
-      toast('Saved.');
-    };
-    input.addEventListener('blur', commit);
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); commit(); input.blur(); }
     });
   });
 
